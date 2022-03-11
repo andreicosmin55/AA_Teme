@@ -12,8 +12,6 @@ def nFibList(n):
         f.append(nFib(i))
     return f
 
-print(nFibList(5))
-
 
 def nthFib(n, x=1, y=1, ls=[1]):
     if y == 1:
@@ -37,5 +35,4 @@ def nFibIterativ(n):
         n -= 1
     return y
 
-print(nFibIterativ(5))
 
