@@ -1,0 +1,140 @@
+import math
+from collections import deque
+def citire(filename):
+    f = open(filename)
+    ls = []
+    n = int(f.readline())
+    for i in range(n):
+        x, y = [float(x) for x in f.readline().split()]
+        ls.append([x, y])
+    f.close()
+    return n, ls
+
+
+def distanta(x1, y1, x2, y2):
+    dist_patrat = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+    return math.sqrt(dist_patrat)
+
+def transformare_graf(lista):
+    for i in range(0,len(lista)):
+        la[i].insert(0,[lista[i][0], lista[i][1]])
+        for j in range(i+1, len(lista)):
+            dst = distanta(lista[i][0], lista[i][1], lista[j][0], lista[j][1])
+            la[i].append([lista[j][0], lista[j][1], dst])
+            la[j].append([lista[i][0], lista[i][1], dst])
+    return(la)
+
+listaa = [[1,2], [3,1], [4,2], [5,4]]
+la = [[] for i in range(len(listaa))]
+graf_orase = transformare_graf(listaa)
+
+sol_curenta =[]
+cost_minim = 100000000
+
+def greedy():
+    cost_sol = 0
+    sol_curenta.append(graf_orase[0][0])
+    j = 0
+    while len(sol_curenta) != len(graf_orase):
+        minn = 1000000
+        for i in graf_orase[j]:
+            if len(i) == 2:
+                continue
+            if i[2] < minn and [i[0], i[1]] not in sol_curenta:
+                minn = i[2]
+        for i in graf_orase[j]:
+            if len(i) == 2:
+                continue
+            if i[2] == minn:
+                sol_curenta.append([i[0], i[1]])
+                cost_sol += i[2]
+                break
+        j += 1
+        print(sol_curenta)
+    print( sol_curenta, cost_sol)
+
+
+
+print(graf_orase)
+copie_gr = graf_orase
+def noua_dist_minima():
+    minn = 1000000
+    i_fin = 0
+    j_fin = 0
+    for i in range(len(copie_gr)):
+        for j in range(1, len(copie_gr[i])):
+            if copie_gr[i][j][2] < minn:
+                minn = copie_gr[i][j][2]
+                i_fin = i
+                j_fin = j
+    copie_gr[i_fin][j_fin][2] = 1000000
+    copie_gr[j_fin][i_fin + 1][2] = 1000000
+    return [graf_orase[i_fin][0], [graf_orase[i_fin][j_fin][0], graf_orase[i_fin][j_fin][1]]]
+
+graf_krusk = []
+def kruskal():
+    while len(graf_krusk) != len(copie_gr)-1:
+        ok1 = True
+        ok2 = True
+        muchie = noua_dist_minima()
+        print(muchie)
+        if len(graf_krusk) >= 2:
+            for i in graf_krusk:
+                if muchie[0] in i:
+                    ok1 = False
+                if muchie[1] in i:
+                    ok2 = False
+        if ok1 == True or ok2 == True:
+            graf_krusk.append(muchie)
+
+    return graf_krusk
+
+vis = []
+for i in graf_orase:
+    vis.append([i[0][0],i[0][1], 0])
+print(vis)
+euler = []
+adj = []
+la_krusk = []
+
+def doubleTree(u):
+    adj = kruskal()
+    for i in vis:
+        if i[0] == u[0] and i[1] == u[1]:
+            i[2] = 1
+    euler.append(u)
+    for i in range(len(graf_orase)):
+        for j in range(1, len(graf_orase[i])):
+            if [graf_orase[i][j][0], graf_orase[i][j][1], 0] in vis:
+                doubleTree([graf_orase[i][j][0], graf_orase[i][j][1]])
+
+
+doubleTree([1,2])
+
+
+
+
+class Cromozom:
+    def __init__(self, a, b, n):
+        self.a = a
+        self.b = b
+        self.n = n
+        self.ls = [0] * n
+        self.increm = (b-a)/(2**n)
+
+    def metoda2(self, ls):
+        self.ls = ls
+        nr = 0
+        for i in range(len(self.ls)-1, -1, -1):
+            if self.ls[i] == 1:
+                nr += 2 **(len(self.ls)-i-1)
+        print(nr)
+        nr *= self.increm
+        self.a += nr
+        print("Valoarea intervalului este acum de la", self.a, "la", self.b)
+        print("Numarul real obtinut din lista primita este:", nr)
+
+crom = Cromozom(3, 18, 5)
+crom.metoda2([1,0,1,0,1])
+crom2 = Cromozom(4,21,8)
+crom2.metoda2([1,0,0,0,1,1,0,1])
